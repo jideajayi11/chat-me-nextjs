@@ -108,7 +108,30 @@
   margin-left: 0.5rem;
 }
 
+.chatDiv {
+  max-width: 300px;
+  margin: 5px 0;
+  width: auto;
+  background-color: #eeeeee;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.leftChat {
+  border-bottom: #000000 5px solid;
+  padding-right: 5px;
+}
+
+.rightChat {
+  border-bottom: #000000 5px double;
+  padding-left: 5px;
+}
+
 @media (max-width: 600px) {
+  .chatDiv {
+    max-width: 200px;
+  }
+
   .grid {
     width: 100%;
     flex-direction: column;
