@@ -7,9 +7,9 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import styles from '../styles/Home.module.css'
 import { getUsers } from '../apolloClient/query'
-import { useQuery } from '@apollo/client'
+import { client } from '../apolloClient'
 import Link from 'next/link'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { useRouter } from 'next/router'
 
 interface ITextFieldError {
@@ -24,27 +24,32 @@ const defaultEmailError: ITextFieldError = {
 
 const Login: NextPage = () => {
   const [email, setEmail] = useState("");
-  const [submitForm, setSubmitForm] = useState(false);
   const [emailError, setEmailError] = useState<ITextFieldError>(defaultEmailError);
-  const { data } = useQuery(getUsers, { variables: { email } });
   const router = useRouter();
 
+  const getUserFunc: any = async () => {
+    try {
+      const res = await client.query({ query: getUsers, variables: { email } });
+      return res?.data?.users;
+    } catch(error: any) {
+      setEmailError({
+        error: true,
+        helperText: "Something went wrong",
+      });
+      return null;
+    }
+  };
   const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value);
-  const handleBtnClick = () => {
+  const handleBtnClick = async () => {
     if (!email) {
       setEmailError({
         error: true,
         helperText: "Email field cannot be empty",
       });
     } else {
-      setSubmitForm(true);
       setEmailError(defaultEmailError);
-    }
-  };
-
-  useEffect(() => {
-    if (submitForm) {
-      if (data?.users.length) {
+      const result = await getUserFunc();
+      if (result.length) {
         router.push("/chats");
       } else {
         setEmailError({
@@ -53,8 +58,7 @@ const Login: NextPage = () => {
         });
       }
     }
-    setSubmitForm(false);
-  }, [submitForm, data]);
+  };
 
   return (
     <div className={styles.container}>
